@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake Game</title>
+    <meta
+      name="description"
+      content="A minimal, responsive classic Snake Game built with HTML, CSS, and JavaScript."
+    />
+    <meta property="og:title" content="Snake Game" />
+    <meta
+      property="og:description"
+      content="A minimal, responsive classic Snake Game built with HTML, CSS, and JavaScript."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="#home" class="logo" data-route="home">🐍 Snake Game</a>
+
+        <nav class="main-nav" aria-label="Primary Navigation">
+          <a href="#home" class="nav-link active" data-route="home" aria-current="page">Home</a>
+          <a href="#play" class="nav-link" data-route="play">Play</a>
+          <a href="#leaderboard" class="nav-link" data-route="leaderboard">Leaderboard</a>
+          <a href="#how-to-play" class="nav-link" data-route="how-to-play">How to Play</a>
+          <a href="#about" class="nav-link" data-route="about">About</a>
+        </nav>
+
+        <div class="header-action">
+          <button type="button" id="headerPlayBtn" class="btn btn-primary btn-sm">
+            Play Now
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Page 1: Home / In-Game Main Menu -->
+      <section id="home" class="page-view page-active" data-page="home">
+        <div class="container menu-wrapper">
+          <div class="section-intro">
+            <h1 class="page-title">Classic Snake Game</h1>
+            <p class="page-subtitle">
+              Choose your speed and border rules, then jump straight into the arena.
+            </p>
+            <p class="menu-meta">
+              Best Score: <strong id="menuBestScore">0</strong>
+              <span aria-hidden="true">·</span>
+              Saved Runs: <strong id="menuSavedCount">0</strong>
+            </p>
+          </div>
+
+          <div class="setup-panel">
+            <div class="setup-group">
+              <span class="setup-label">Difficulty Speed</span>
+              <div class="segmented-group" role="group" aria-label="Difficulty">
+                <button
+                  type="button"
+                  class="segment-btn"
+                  data-difficulty="Easy"
+                >
+                  Easy
+                </button>
+                <button
+                  type="button"
+                  class="segment-btn active"
+                  data-difficulty="Normal"
+                >
+                  Normal
+                </button>
+                <button
+                  type="button"
+                  class="segment-btn"
+                  data-difficulty="Hard"
+                >
+                  Hard
+                </button>
+              </div>
+            </div>
+
+            <div class="setup-group">
+              <span class="setup-label">Border Mode</span>
+              <div class="segmented-group" role="group" aria-label="Border Mode">
+                <button
+                  type="button"
+                  class="segment-btn active"
+                  data-wall-mode="Solid"
+                >
+                  Solid Walls
+                </button>
+                <button
+                  type="button"
+                  class="segment-btn"
+                  data-wall-mode="Wrap"
+                >
+                  Wrap-Around
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-actions">
+            <button type="button" id="homePlayBtn" class="btn btn-primary">
+              Start Playing
+            </button>
+            <button type="button" id="homeLeaderboardBtn" class="btn btn-secondary">
+              View Leaderboard
+            </button>
+            <button type="button" id="homeHowToBtn" class="btn btn-secondary">
+              How to Play
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 2: Play / In-Game Arena -->
+      <section id="play" class="page-view" data-page="play" hidden>
+        <div class="container game-wrapper">
+          <div class="arena-topbar">
+            <button type="button" id="backToMenuBtn" class="text-back-btn">
+              &larr; Main Menu
+            </button>
+            <span id="arenaModeLabel" class="arena-mode-label">
+              Normal · Solid Walls
+            </span>
+          </div>
+
+          <div class="scoreboard" aria-live="polite">
+            <div class="score-item">
+              <span class="score-label">Score</span>
+              <span id="scoreDisplay" class="score-value">0</span>
+            </div>
+            <span class="score-divider" aria-hidden="true"></span>
+            <div class="score-item">
+              <span class="score-label">High Score</span>
+              <span id="highScoreDisplay" class="score-value">0</span>
+            </div>
+          </div>
+
+          <div class="canvas-stage">
+            <canvas
+              id="gameCanvas"
+              width="440"
+              height="440"
+              aria-label="Snake game board"
+            ></canvas>
+
+            <!-- Start Overlay -->
+            <div id="startOverlay" class="canvas-overlay">
+              <div class="overlay-content">
+                <h2 class="overlay-title">Ready to Play</h2>
+                <p class="overlay-text">
+                  Press Start Game or hit Enter to begin.
+                </p>
+                <button type="button" id="overlayStartBtn" class="btn btn-primary">
+                  Start Game
+                </button>
+              </div>
+            </div>
+
+            <!-- Pause Overlay -->
+            <div id="pauseOverlay" class="canvas-overlay hidden" aria-hidden="true">
+              <div class="overlay-content">
+                <h2 class="overlay-title">Game Paused</h2>
+                <p class="overlay-text">
+                  Take a quick breather and resume when ready.
+                </p>
+                <div class="overlay-btn-stack">
+                  <button type="button" id="overlayResumeBtn" class="btn btn-primary">
+                    Resume
+                  </button>
+                  <button type="button" id="pauseMenuBtn" class="btn btn-secondary btn-sm">
+                    Main Menu
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Game Over Overlay -->
+            <div id="gameOverOverlay" class="canvas-overlay hidden" aria-hidden="true">
+              <div class="overlay-content">
+                <h2 class="overlay-title overlay-title-danger">Game Over</h2>
+                <div class="final-stats">
+                  <div class="final-stat-row">
+                    <span>Final Score</span>
+                    <strong id="finalScoreDisplay">0</strong>
+                  </div>
+                  <div class="final-stat-row">
+                    <span>Best Score</span>
+                    <strong id="bestScoreDisplay">0</strong>
+                  </div>
+                </div>
+                <form id="saveScoreForm" class="save-score-form">
+                  <label for="playerNameInput" class="sr-only">Player Name</label>
+                  <input
+                    type="text"
+                    id="playerNameInput"
+                    class="name-input"
+                    maxlength="18"
+                    placeholder="Your name"
+                    autocomplete="nickname"
+                  />
+                  <button type="submit" id="saveScoreBtn" class="btn btn-secondary btn-sm">
+                    Save Score
+                  </button>
+                </form>
+                <p id="saveFeedback" class="save-feedback" aria-live="polite"></p>
+                <div class="overlay-btn-row">
+                  <button type="button" id="playAgainBtn" class="btn btn-primary">
+                    Play Again
+                  </button>
+                  <button type="button" id="gameOverLeaderboardBtn" class="btn btn-secondary btn-sm">
+                    Leaderboard
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="game-controls">
+            <button type="button" id="startBtn" class="btn btn-primary">
+              Start Game
+            </button>
+            <button type="button" id="pauseBtn" class="btn btn-secondary" disabled>
+              Pause
+            </button>
+            <button type="button" id="restartBtn" class="btn btn-secondary">
+              Restart
+            </button>
+          </div>
+
+          <!-- On-screen Arrow Controls for Mobile & Touch -->
+          <div class="mobile-controls" aria-label="On-screen directional controls">
+            <div class="dpad-row">
+              <button
+                type="button"
+                id="btnUp"
+                class="dpad-btn"
+                aria-label="Move Up"
+              >
+                ⬆️
+              </button>
+            </div>
+            <div class="dpad-row dpad-row-middle">
+              <button
+                type="button"
+                id="btnLeft"
+                class="dpad-btn"
+                aria-label="Move Left"
+              >
+                ⬅️
+              </button>
+              <button
+                type="button"
+                id="btnDown"
+                class="dpad-btn"
+                aria-label="Move Down"
+              >
+                ⬇️
+              </button>
+              <button
+                type="button"
+                id="btnRight"
+                class="dpad-btn"
+                aria-label="Move Right"
+              >
+                ➡️
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 3: Leaderboard -->
+      <section id="leaderboard" class="page-view info-section" data-page="leaderboard" hidden>
+        <div class="container info-container">
+          <div class="section-header-row">
+            <div>
+              <h1 class="section-heading">Leaderboard</h1>
+              <p class="section-subheading">
+                Top 10 saved scores stored locally in your browser.
+              </p>
+            </div>
+            <button
+              type="button"
+              id="clearLeaderboardBtn"
+              class="btn btn-secondary btn-sm"
+            >
+              Clear Scores
+            </button>
+          </div>
+
+          <div class="filter-bar" role="group" aria-label="Filter scores by difficulty">
+            <button type="button" class="filter-btn active" data-filter="All">All</button>
+            <button type="button" class="filter-btn" data-filter="Easy">Easy</button>
+            <button type="button" class="filter-btn" data-filter="Normal">Normal</button>
+            <button type="button" class="filter-btn" data-filter="Hard">Hard</button>
+          </div>
+
+          <div id="leaderboardEmpty" class="leaderboard-empty">
+            No scores saved yet. Finish a game and save your score to appear on the board.
+          </div>
+
+          <div id="leaderboardTableWrap" class="leaderboard-table-wrap hidden">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th scope="col" class="col-rank">Rank</th>
+                  <th scope="col">Player</th>
+                  <th scope="col">Mode</th>
+                  <th scope="col" class="col-score">Score</th>
+                  <th scope="col" class="col-date">Date</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody"></tbody>
+            </table>
+          </div>
+
+          <div class="page-footer-actions">
+            <button type="button" class="btn btn-primary" data-goto="play">
+              Play a Round
+            </button>
+            <button type="button" class="btn btn-secondary" data-goto="home">
+              Back to Menu
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 4: How to Play -->
+      <section id="how-to-play" class="page-view info-section" data-page="how-to-play" hidden>
+        <div class="container info-container">
+          <h1 class="section-heading">How to Play</h1>
+          <ol class="rules-list">
+            <li class="rule-item">
+              <span class="rule-number">01</span>
+              <div class="rule-body">
+                <h3>Move the Snake</h3>
+                <p>Use arrow keys or WASD to move. On mobile devices, tap the on-screen arrow buttons below the board.</p>
+              </div>
+            </li>
+            <li class="rule-item">
+              <span class="rule-number">02</span>
+              <div class="rule-body">
+                <h3>Eat Apples to Grow</h3>
+                <p>Eat apples to grow longer. Each red apple adds 10 points to your score and gradually increases speed.</p>
+              </div>
+            </li>
+            <li class="rule-item">
+              <span class="rule-number">03</span>
+              <div class="rule-body">
+                <h3>Avoid Walls &amp; Body</h3>
+                <p>In Solid Walls mode, hitting the border ends the game. In Wrap-Around mode, you pass through to the opposite edge.</p>
+              </div>
+            </li>
+            <li class="rule-item">
+              <span class="rule-number">04</span>
+              <div class="rule-body">
+                <h3>Beat Your Record</h3>
+                <p>Try to achieve the highest score and save your name to the local leaderboard after Game Over.</p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="shortcuts-box">
+            <h2 class="shortcuts-title">Keyboard Shortcuts</h2>
+            <div class="shortcuts-grid">
+              <div class="shortcut-row"><span>Move</span><strong>Arrow Keys / W A S D</strong></div>
+              <div class="shortcut-row"><span>Pause / Resume</span><strong>Space or P</strong></div>
+              <div class="shortcut-row"><span>Start / Play Again</span><strong>Enter</strong></div>
+            </div>
+          </div>
+
+          <div class="page-footer-actions">
+            <button type="button" class="btn btn-primary" data-goto="play">
+              Play Now
+            </button>
+            <button type="button" class="btn btn-secondary" data-goto="home">
+              Back to Menu
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 5: About -->
+      <section id="about" class="page-view info-section" data-page="about" hidden>
+        <div class="container info-container">
+          <h1 class="section-heading">About</h1>
+          <p class="about-text">
+            Snake Game is a classic arcade game developed using HTML, CSS, and
+            JavaScript. This project demonstrates fundamental programming
+            concepts including loops, conditions, event handling, arrays,
+            collision detection, and DOM manipulation.
+          </p>
+          <div class="concept-strip">
+            <span>Loops &amp; Game Tick</span>
+            <span aria-hidden="true">·</span>
+            <span>Arrays for Snake Segments</span>
+            <span aria-hidden="true">·</span>
+            <span>Collision Detection</span>
+            <span aria-hidden="true">·</span>
+            <span>DOM &amp; Keyboard Events</span>
+            <span aria-hidden="true">·</span>
+            <span>Hash Multi-Page Routing</span>
+            <span aria-hidden="true">·</span>
+            <span>localStorage Persistence</span>
+          </div>
+
+          <div class="page-footer-actions">
+            <button type="button" class="btn btn-primary" data-goto="play">
+              Play Now
+            </button>
+            <button type="button" class="btn btn-secondary" data-goto="home">
+              Back to Menu
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p class="footer-meta">
+          Made as a college mini-project <span aria-hidden="true">·</span>
+          Technology: HTML, CSS, JavaScript
+        </p>
+        <p class="footer-copy">&copy; 2026 Snake Game. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
